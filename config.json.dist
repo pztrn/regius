@@ -1,0 +1,11 @@
+{
+    "preseed": {
+        "app_name": "Application",
+        "version": "0.0.1",
+        "url": "https://localhost/",
+        "auth": 0
+    },
+    "paths": {
+        "regius": "/path/to/regius/"
+    }
+}

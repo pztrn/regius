@@ -1,0 +1,10 @@
+.DS_Store
+.bak
+.python-version
+__pycache__
+
+config/[3-9][0-9]*
+logs/*
+
+alembic.ini
+config.json
