@@ -215,7 +215,7 @@ class Loader:
         self.log(0, "Shutting down libraries...")
         for item in self.__libraries:
             # Completely pass main form :)
-            if item == "MAIN.MAIN":
+            if item == "MAIN.MAIN" or item == "MAIN.GUI" or item == "MAIN.CLI":
                 continue
 
             # Execute shutdown actions for everything except logger.

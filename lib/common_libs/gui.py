@@ -124,12 +124,6 @@ class Gui(QMainWindow):
         self.loading_widget.set_action("Loading complete.")
         self.loading_widget.set_loading_complete()
 
-    def on_shutdown(self):
-        """
-        Stub for on_shutdown() call from Loader().
-        """
-        pass
-
     def show_about_dialog(self):
         """
         Shows About dialog.

@@ -96,7 +96,6 @@ class Regius:
         exit code 1.
         """
         self.log(0, "Shutting down...")
-        self.ui.statusbar.showMessage("Shutting down...")
         self.log(2, "Received {arg_count} arguments for shutdown type:", {"arg_count": len(args)})
         self.log(2, args)
         self.config.save_configuration()

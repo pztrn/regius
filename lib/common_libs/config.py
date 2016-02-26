@@ -107,7 +107,10 @@ class Config(Library):
         This preseed file is optional. If no preseed file will be found:
         adding new database server dialog will appear.
         """
-        self.__qconfig.load_configuration()
+        if preseed["preseed"]["ui"] == "gui":
+            self.__qconfig.load_configuration()
+        else:
+            self.log(0, "Skipping QConfig initialization.")
         self.__json.load_configuration()
         self.__temp_settings.update(preseed)
 
