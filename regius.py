@@ -63,7 +63,7 @@ class Regius(QMainWindow):
         if "app_name" in preseed["preseed"]:
             self.config.set_temp_value("main/application_name", preseed["preseed"]["app_name"])
         else:
-            self.config.set_temp_value("main/application_name", "Default application")
+            self.config.set_temp_value("main/application_name", "Regius")
 
         if preseed["preseed"]["ui"] == "gui":
             self.options = OptionsDialog()
