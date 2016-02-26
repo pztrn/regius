@@ -24,7 +24,6 @@ from lib.common_libs.library import Library
 
 # Configuration classes.
 from lib.common_libs.config_types.json import JSON
-from lib.common_libs.config_types.qconfig import QConfig
 
 class Config(Library):
     """
@@ -94,7 +93,10 @@ class Config(Library):
             self.log(2, "Configuration directory does not exist, creating...")
             os.makedirs(os.path.expanduser(os.path.join("~/.config/tovarouchet")))
 
-        self.__qconfig = QConfig(self.log, self.loader)
+        if common.TEMP_SETTINGS["UI"] == "gui":
+            from lib.common_libs.config_types.qconfig import QConfig
+            self.__qconfig = QConfig(self.log, self.loader)
+
         self.__json = JSON(self.log, self.loader)
 
         # Update self.__temp_settings with values from common.TEMP_SETTINGS.

@@ -18,8 +18,6 @@
 import os
 import sys
 
-from PyQt5 import uic
-
 from lib.common_libs import common
 from lib.common_libs.logger import Logger
 
@@ -196,6 +194,11 @@ class Loader:
         if not ui_filepath in self.__uis:
             self.log(1, "UI {filepath} not loaded, loading it now...", {"filepath": ui_filepath})
             # Load UI.
+            # For those who will ask me about this import - yes, it is
+            # required for proper CLI-GUI separation.
+            # And no, I saw no memory footprint increasing while doing
+            # this. And yes, this is not PEP8.
+            from PyQt5 import uic
             ui = uic.loadUi(ui_path, instance)
 
             # Assing UI instance to self.__uis element, so we could request

@@ -21,8 +21,6 @@ import os
 import signal
 import sys
 
-from PyQt5.QtCore import QTimer
-
 from lib.common_libs import common
 from lib.common_libs.loader import Loader
 
@@ -32,7 +30,10 @@ app = None
 
 class Regius:
     def __init__(self, preseed):
-
+        if preseed["preseed"]["ui"] == "gui":
+            common.TEMP_SETTINGS["UI"] = "gui"
+        else:
+            common.TEMP_SETTINGS["UI"] = "cli"
 
         # Initialize loader.
         self.loader = Loader()
@@ -49,16 +50,6 @@ class Regius:
         if not "app_name" in preseed["preseed"]:
             preseed["preseed"]["app_name"] = "Regius"
         self.config.load_configuration_from_files(preseed)
-
-        # Initialize Timer() library.
-        #self.timer = self.loader.request_library("common_libs", "timer")
-
-        # Prepare main database connection.
-        #self.database = self.loader.request_library("common_libs", "database")
-        #self.database.load_mappings()
-
-        # Initialize database migrator.
-        #self.migrator = self.loader.request_library("database_tools", "migrator")
 
         # We are still not initialized.
         self.config.set_temp_value("core/initialized", False)
