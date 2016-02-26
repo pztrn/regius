@@ -210,19 +210,20 @@ class OptionsDialog(Dialog):
             if not name in self.__failed_to_load:
                 self.__failed_to_load.append(name)
 
-        self.log(1, "Option pane '{CYAN}{pane_name}{RESET}' successfully loaded", {"pane_name": name})
+        if not name in self.__failed_to_load:
+            self.log(1, "Option pane '{CYAN}{pane_name}{RESET}' successfully loaded", {"pane_name": name})
 
-        # Plugins panes SHOULD NOT override general ones.
-        if type == "plugin":
-            if not name in self.__option_panes_code:
+            # Plugins panes SHOULD NOT override general ones.
+            if type == "plugin":
+                if not name in self.__option_panes_code:
+                    self.__option_panes_code[name] = self.module
+                    del self.module
+                else:
+                    box = MessageBox("error", "Failed to load option pane", "Plugin option pane '{0}' tries to overwrite general option pane!.".format(plugin_name))
+                    box.show()
+            else:
                 self.__option_panes_code[name] = self.module
                 del self.module
-            else:
-                box = MessageBox("error", "Failed to load option pane", "Plugin option pane '{0}' tries to overwrite general option pane!.".format(plugin_name))
-                box.show()
-        else:
-            self.__option_panes_code[name] = self.module
-            del self.module
 
     def __load_general_panes(self):
         """
