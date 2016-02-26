@@ -48,7 +48,6 @@ class Plugin(Library):
         Plugin initialization.
         """
         self.config = self.loader.request_library("common_libs", "config")
-        self.timer = self.loader.request_library("common_libs", "timer")
 
         self.__main_ui = self.loader.request_ui("ui/main_window", None)
 

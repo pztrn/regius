@@ -101,6 +101,9 @@ class Regius(QMainWindow):
             self.ui.actionShow_Logs.triggered.connect(self.show_logs_dialog)
             self.ui.action_About.triggered.connect(self.show_about_dialog)
 
+            # Replace some texts on some items in UI.
+            self.ui.action_About.setText("&About {0}...".format(self.config.get_temp_value("main/application_name")))
+
             self.authorize()
 
     def authorize(self):
