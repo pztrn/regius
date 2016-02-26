@@ -39,13 +39,6 @@ class JSON:
         if group in self.__config:
             return self.__config[group].keys()
 
-    def get_preseeded_configuration(self):
-        """
-        Returns preseeded configuration to caller.
-        """
-        if "preseed" in self.__config:
-            return self.__config["preseed"]
-
     def get_value(self, group, key):
         """
         Returns a value for key in group. Easy-peasy! :)

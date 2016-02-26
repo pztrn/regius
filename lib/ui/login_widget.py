@@ -72,7 +72,7 @@ class Login_widget(QWidget, Library):
 
         self.__tab_index = self.__main_ui.tabs.addTab(self.ui, "Login...")
 
-        self.__main = self.loader.request_library("main", "main")
+        self.__main = self.loader.request_library("main", "gui")
 
         self.ui.login_button.clicked.connect(self.__check_auth)
         # Enable login and password input fields only if auth = 1
