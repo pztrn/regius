@@ -5,7 +5,9 @@ handle both GUI and CLI applications. It provides:
 
 * Plugins and libraries loader
 * Configuration
-* Logger
+* Logger:
+  * Output to stdout
+  * Output to file
 * Database layer
 * GUI:
   * Main window with tab widget
