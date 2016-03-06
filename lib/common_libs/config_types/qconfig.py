@@ -61,12 +61,14 @@ class QConfig:
 
         return self.__config[group][key]
 
-    def load_configuration(self):
+    def load_configuration(self, app_name, config_path = None):
         """
         Reads configuration from QSettings file into 2-level dict.
         """
+        self.__app_name = app_name
+        self.__cfg_dir = os.path.expanduser(os.path.join("~/", ".config/", "regius", self.__app_name))
         self.log(0, "Reading Qt configuration...")
-        self.qsettings = QSettings(os.path.join("tovarouchet", "qsettings"))
+        self.qsettings = QSettings(os.path.join("regius", self.__app_name, "qsettings"))
 
         self.log(1, "Reading main window configuration...")
         for item in self.qsettings.allKeys():
@@ -85,6 +87,10 @@ class QConfig:
         Saves configuration to QSettings instance.
         """
         self.log(0, "Saving Qt configuration...")
+
+        # Create configuration directory, if it not exist.
+        if not os.path.exists(self.__cfg_dir):
+            os.makedirs(self.__cfg_dir)
 
         for section in self.__config:
             if len(self.__config[section]) > 0:

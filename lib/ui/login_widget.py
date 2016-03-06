@@ -57,34 +57,43 @@ class Login_widget(QWidget, Library):
 
         connections = []
 
-        for item in __db_data:
-            conn_name = item.split("_")[0]
-            if not conn_name in connections:
-                connections.append(conn_name)
+        if __db_data:
+            for item in __db_data:
+                conn_name = item.split("_")[0]
+                if not conn_name in connections:
+                    connections.append(conn_name)
 
-        self.log(2, "Connections list obtained:")
-        self.log(2, connections)
+            self.log(2, "Connections list obtained:")
+            self.log(2, connections)
 
-        self.log(1, "Adding connections to connections selector...")
+            self.log(1, "Adding connections to connections selector...")
 
-        for conn_name in connections:
-            self.ui.connections.addItem(conn_name)
+            for conn_name in connections:
+                self.ui.connections.addItem(conn_name)
 
-        self.__tab_index = self.__main_ui.tabs.addTab(self.ui, "Login...")
+            self.__tab_index = self.__main_ui.tabs.addTab(self.ui, "Login...")
 
-        self.__main = self.loader.request_library("main", "gui")
+            self.__main = self.loader.request_library("main", "gui")
 
-        self.ui.login_button.clicked.connect(self.__check_auth)
-        # Enable login and password input fields only if auth = 1
-        # in preseed config.
-        if self.config.get_value("json", "preseed", "auth") == 1:
-            self.ui.username.returnPressed.connect(self.__check_auth)
-            self.ui.password.returnPressed.connect(self.__check_auth)
+            self.ui.login_button.clicked.connect(self.__check_auth)
+            # Enable login and password input fields only if auth = 1
+            # in preseed config.
+            if self.config.get_value("json", "preseed", "auth") == 1:
+                self.ui.username.returnPressed.connect(self.__check_auth)
+                self.ui.password.returnPressed.connect(self.__check_auth)
+            else:
+                self.ui.username.setVisible(False)
+                self.ui.password.setVisible(False)
+                self.ui.label_2.setVisible(False)
+                self.ui.label_3.setVisible(False)
         else:
-            self.ui.username.setVisible(False)
-            self.ui.password.setVisible(False)
-            self.ui.label_2.setVisible(False)
-            self.ui.label_3.setVisible(False)
+            self.log(0, "No database connections defined.")
+            # We run in databaseless mode.
+            self.config.set_temp_value("main/databaseless", True)
+            # Flag that indicates that there is no database connection
+            # configured at all. It can be used later by database
+            # connection creation dialog, or something like that.
+            self.config.set_temp_value("main/database_not_configured", True)
 
     def __check_auth(self):
         """

@@ -49,14 +49,15 @@ class Plugin(Library):
         """
         self.config = self.loader.request_library("common_libs", "config")
 
-        self.__main_ui = self.loader.request_ui("ui/main_window", None)
+        if self.config.get_temp_value("UI") == "gui":
+            self.__main_ui = self.loader.request_ui("ui/main_window", None)
 
-        self.toolbar = self.__main_ui.main_toolbar
-        self.statusbar = self.__main_ui.statusbar
+            self.toolbar = self.__main_ui.main_toolbar
+            self.statusbar = self.__main_ui.statusbar
 
-        self.loading_widget = self.loader.request_library("ui", "loading_widget")
+            self.loading_widget = self.loader.request_library("ui", "loading_widget")
 
-        self.set_loading_action = self.loading_widget.progress.setFormat
+            self.set_loading_action = self.loading_widget.progress.setFormat
 
     def load_ui(self, ui_filepath):
         """

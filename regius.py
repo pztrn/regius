@@ -38,6 +38,7 @@ class Regius:
         # Initialize loader.
         self.loader = Loader()
         self.loader.add_pointer("main.main", self)
+        common.LOADER = self.loader
 
         # Initialize logger.
         self.__logger = self.loader.request_library("common_libs", "logger")

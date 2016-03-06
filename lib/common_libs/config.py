@@ -89,9 +89,9 @@ class Config(Library):
         dictionary (self.__temp_settings) for get_temp_value() and
         set_temp_value() methods work.
         """
-        if not os.path.exists(os.path.expanduser(os.path.join("~/.config/tovarouchet"))):
+        if not os.path.exists(os.path.expanduser(os.path.join("~/.config/regius"))):
             self.log(2, "Configuration directory does not exist, creating...")
-            os.makedirs(os.path.expanduser(os.path.join("~/.config/tovarouchet")))
+            os.makedirs(os.path.expanduser(os.path.join("~/.config/regius")))
 
         if common.TEMP_SETTINGS["UI"] == "gui":
             from lib.common_libs.config_types.qconfig import QConfig
@@ -110,10 +110,10 @@ class Config(Library):
         adding new database server dialog will appear.
         """
         if preseed["preseed"]["ui"] == "gui":
-            self.__qconfig.load_configuration()
+            self.__qconfig.load_configuration(preseed["preseed"]["app_name"])
         else:
             self.log(0, "Skipping QConfig initialization.")
-        self.__json.load_configuration()
+        self.__json.load_configuration(preseed["preseed"]["app_name"])
         self.__temp_settings.update(preseed)
 
     def save_configuration(self):

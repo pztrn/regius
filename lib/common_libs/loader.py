@@ -143,7 +143,7 @@ class Loader:
         caller = sys._getframe(1).f_locals["self"].__class__.__name__
         if plugin_name.upper() in self.__plugins:
             self.log(2, "Already loaded, returning pointer to plugin '{CYAN}{plugin}{RESET}' to '{MAGENTA}{caller}{RESET}'", {"plugin": plugin_name.upper(), "caller": caller})
-            self.__plugin_requesters.pop()
+            #self.__plugin_requesters.pop()
             return self.__plugins[plugin_name.upper()]
         else:
             self.log(1, "Plugin '{MAGENTA}{plugin_name}{RESET}' not loaded, loading...", {"plugin_name": plugin_name})
@@ -152,7 +152,7 @@ class Loader:
                 self.__add_plugin(plugin_name.upper(), plugin)
             else:
                 self.log(2, "Failed to load plugin '{CYAN}{plugin}{RESET}', returning None", {"plugin": plugin_name.upper()})
-                self.__plugin_requesters.pop()
+                #self.__plugin_requesters.pop()
                 return None
             self.log(2, "Returning pointer to plugin '{CYAN}{plugin}{RESET}' to '{MAGENTA}{caller}{RESET}'", {"plugin": plugin_name.upper(), "caller": caller})
             return self.__plugins[plugin_name.upper()]

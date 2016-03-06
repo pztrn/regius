@@ -58,6 +58,9 @@ class Gui(QMainWindow):
 
         self.authorize()
 
+        if self.config.get_temp_value("main/databaseless"):
+            self.load_app()
+
     def authorize(self):
         """
         This method responsible for authorization process.
@@ -86,6 +89,9 @@ class Gui(QMainWindow):
         # As it cannot be actually predicted (or I don't know yet how to
         # to that) - it's hardcoded.
         main_actions = 6
+        # Decrement steps by one for databaseless configuration.
+        if self.config.get_temp_value("main/databaseless"):
+            main_actions -= 1
         # Plugins count. Every plugin will take one position in progress
         # bar maximum value.
         plugins_actions = self.__get_plugins_count()
@@ -105,9 +111,10 @@ class Gui(QMainWindow):
         self.loading_widget.set_action("Main UI signals connected.")
 
         # Execute database migrations.
-        self.loading_widget.set_action("Executing database migrations...")
-        self.migrator.migrate()
-        self.loading_widget.increment_progress()
+        if not self.config.get_temp_value("main/databaseless"):
+            self.loading_widget.set_action("Executing database migrations...")
+            self.migrator.migrate()
+            self.loading_widget.increment_progress()
 
         # Plugins loading.
         self.__load_plugins()

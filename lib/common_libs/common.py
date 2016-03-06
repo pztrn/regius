@@ -23,3 +23,5 @@ TEMP_SETTINGS = {
     # Current user name.
     "CURRENT_USER"                          : None
 }
+
+LOADER = None

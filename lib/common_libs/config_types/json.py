@@ -30,7 +30,6 @@ class JSON:
         self.loader = loader
         self.log = logger
         self.__config = {}
-        self.__main_cfg = os.path.expanduser("~/.config/tovarouchet/config.json")
 
     def get_keys_for_group(self, group):
         """
@@ -53,10 +52,14 @@ class JSON:
 
         return self.__config[group][key]
 
-    def load_configuration(self):
+    def load_configuration(self, app_name, config_path = None):
         """
         Reads configuration from JSON file into dict.
         """
+        self.__app_name = app_name
+        self.__cfg_dir = os.path.expanduser(os.path.join("~/", ".config/", "regius", self.__app_name))
+        self.__main_cfg = os.path.join(self.__cfg_dir, "config.json")
+
         self.log(0, "Reading JSON configuration...")
         # Read main config.
         if os.path.exists(self.__main_cfg):
@@ -77,6 +80,10 @@ class JSON:
         # Do not save preseed data if present, it is unchangeable.
         if "preseed" in self.__config:
             del self.__config["preseed"]
+
+        # Create configuration directory, if it not exist.
+        if not os.path.exists(self.__cfg_dir):
+            os.makedirs(self.__cfg_dir)
 
         config_data = json.dumps(self.__config, indent = 4)
         with open(self.__main_cfg, "w") as cfg:
