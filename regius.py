@@ -52,6 +52,13 @@ class Regius:
             preseed["preseed"]["app_name"] = "Regius"
         self.config.load_configuration_from_files(preseed)
 
+        # After configuration was properly initialized we should set
+        # some logger parameters.
+        if "logger" in preseed:
+            self.__logger.initialize_preliminary_parameters(self.config, preseed["logger"])
+        else:
+            self.__logger.initialize_preliminary_parameters(self.config, preseed["logger"])
+
         # We are still not initialized.
         self.config.set_temp_value("core/initialized", False)
 

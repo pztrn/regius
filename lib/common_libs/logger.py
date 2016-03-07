@@ -73,12 +73,16 @@ class Logger(Library):
         self.__vars = {
             # Was file successfully opened for writing?
             "file_opened"       : False,
-            "OS"                : platform.system()
+            "OS"                : platform.system(),
+            # Skip writing logging data into dictionary?
+            "skip_complete_log" : 0
         }
 
         self.__callbacks = {}
         self.__complete_log = OrderedDict()
         self.__log_sequence = 0
+        # Default debug level?
+        self.__debug_level = 0
 
     def get_logs(self, **kwargs):
         """
@@ -128,6 +132,30 @@ class Logger(Library):
         except:
             self.log(0, "Failed to open log file for writing!")
 
+    def initialize_preliminary_parameters(self, config, preseed = None):
+        """
+        Initializes some parameters, like initial debug level.
+        """
+        if preseed:
+            if "runtime_logs_access" in preseed:
+                if not preseed["runtime_logs_access"]:
+                    self.__vars["skip_complete_log"] = 1
+
+            if "default_debug_level" in preseed:
+                if preseed["default_debug_level"] > 2:
+                    self.__debug_level = 2
+                elif preseed["default_debug_level"] < 0:
+                    self.__debug_level = 0
+                else:
+                    self.__debug_level = preseed["default_debug_level"]
+
+        # All previous values can be overrided by configuration.
+        for backend in config.get_available_backends():
+            cfg_dbg_level = config.get_value(backend.lower(), "logger", "debug_level")
+            if cfg_dbg_level and cfg_dbg_level != self.__debug_level:
+                self.log(0, "Setting log level to {log_level}", {"log_level": cfg_dbg_level})
+                self.__debug_level = cfg_dbg_level
+
     def log(self, level, data, replace_data = {}):
         """
         Do logprinting. By default, it will print to console. But this
@@ -153,7 +181,8 @@ class Logger(Library):
 
         # Prepare internally-used logs storage to be updated with
         # new data.
-        self.__complete_log[self.__log_sequence] = {}
+        if not self.__vars["skip_complete_log"]:
+            self.__complete_log[self.__log_sequence] = {}
 
         # Create resource-usage thing.
         if self.__vars["OS"] == "Darwin":
@@ -213,18 +242,19 @@ class Logger(Library):
                 self.file.flush()
 
             # Add to internal-accessible log storage.
-            self.__complete_log[self.__log_sequence] = {
-                "module": caller_class,
-                "timestamp": raw_timestamp,
-                "level": level,
-                "data": file_data
-            }
+            if not self.__vars["skip_complete_log"]:
+                self.__complete_log[self.__log_sequence] = {
+                    "module": caller_class,
+                    "timestamp": raw_timestamp,
+                    "level": level,
+                    "data": file_data
+                }
 
-            if "ERROR" in file_data or "Error" in file_data["data"]:
-                self.__complete_log[self.__log_sequence]["type"] = "error"
-            else:
-                self.__complete_log[self.__log_sequence]["type"] = "normal"
-        elif level == 1:
+                if "ERROR" in file_data or "Error" in file_data["data"]:
+                    self.__complete_log[self.__log_sequence]["type"] = "error"
+                else:
+                    self.__complete_log[self.__log_sequence]["type"] = "normal"
+        elif level == 1 and self.__debug_level >= 1:
             lightdebug = {
                 "green" : TERM_COLORS["GREEN"],
                 "yellow": TERM_COLORS["YELLOW"],
@@ -251,19 +281,20 @@ class Logger(Library):
                 self.file.flush()
 
             # Add to internal-accessible log storage.
-            self.__complete_log[self.__log_sequence] = {
-                "module": caller_class,
-                "timestamp": raw_timestamp,
-                "level": level,
-                "data": file_data
-            }
+            if not self.__vars["skip_complete_log"]:
+                self.__complete_log[self.__log_sequence] = {
+                    "module": caller_class,
+                    "timestamp": raw_timestamp,
+                    "level": level,
+                    "data": file_data
+                }
 
-            if "ERROR" in file_data or "Error" in file_data["data"]:
-                self.__complete_log[self.__log_sequence]["type"] = "error"
-            else:
-                self.__complete_log[self.__log_sequence]["type"] = "debug"
+                if "ERROR" in file_data or "Error" in file_data["data"]:
+                    self.__complete_log[self.__log_sequence]["type"] = "error"
+                else:
+                    self.__complete_log[self.__log_sequence]["type"] = "debug"
 
-        elif level == 2:
+        elif level == 2 and self.__debug_level == 2:
             harddebug = {
                 "red"   : TERM_COLORS["RED"],
                 "green" : TERM_COLORS["GREEN"],
@@ -291,25 +322,27 @@ class Logger(Library):
                 self.file.flush()
 
             # Add to internal-accessible log storage.
-            self.__complete_log[self.__log_sequence] = {
-                "module": caller_class,
-                "timestamp": raw_timestamp,
-                "level": level,
-                "data": file_data
-            }
+            if not self.__vars["skip_complete_log"]:
+                self.__complete_log[self.__log_sequence] = {
+                    "module": caller_class,
+                    "timestamp": raw_timestamp,
+                    "level": level,
+                    "data": file_data
+                }
 
-            if "ERROR" in file_data or "Error" in file_data["data"]:
-                self.__complete_log[self.__log_sequence]["type"] = "error"
-            else:
-                self.__complete_log[self.__log_sequence]["type"] = "harddebug"
+                if "ERROR" in file_data or "Error" in file_data["data"]:
+                    self.__complete_log[self.__log_sequence]["type"] = "error"
+                else:
+                    self.__complete_log[self.__log_sequence]["type"] = "harddebug"
 
-        self.__log_sequence += 1
-        # Checking if filedata is here. If yes - push it to callback.
-        # This push will happen only if callbacks were added with
-        # self.register_callback() method.
-        if len(file_data) > 0 and len(self.__callbacks) > 0:
-            for callback in self.__callbacks:
-                self.__callbacks[callback](self.__complete_log[self.__log_sequence - 1])
+        if not self.__vars["skip_complete_log"]:
+            self.__log_sequence += 1
+            # Checking if filedata is here. If yes - push it to callback.
+            # This push will happen only if callbacks were added with
+            # self.register_callback() method.
+            if len(file_data) > 0 and len(self.__callbacks) > 0:
+                for callback in self.__callbacks:
+                    self.__callbacks[callback](self.__complete_log[self.__log_sequence - 1])
 
     def on_shutdown(self):
         """

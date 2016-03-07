@@ -79,7 +79,8 @@ class JSON:
             if os.path.exists(app_config):
                 for cfg_file in os.listdir(app_config):
                     if cfg_file.endswith(".json"):
-                        self.__config.update(json.loads(open(cfg_file, "r").read()))
+                        cfg_file_path = os.path.join(app_config, cfg_file)
+                        self.__config.update(json.loads(open(cfg_file_path, "r").read()))
 
     def save_configuration(self):
         """

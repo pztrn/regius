@@ -50,6 +50,12 @@ class Config(Library):
         # Can be obtained from files, or database.
         self.__config = {}
 
+    def get_available_backends(self):
+        """
+        Returns a list of available backends.
+        """
+        return self.__available_backends
+
     def get_keys_for_group(self, type, group):
         """
         Returns all keys for specified group.
@@ -101,6 +107,9 @@ class Config(Library):
 
         # Update self.__temp_settings with values from common.TEMP_SETTINGS.
         self.__temp_settings.update(common.TEMP_SETTINGS)
+
+        # Someday it will be dynamic.
+        self.__available_backends = ["JSON", "QConfig"]
 
     def load_configuration_from_files(self, preseed):
         """
