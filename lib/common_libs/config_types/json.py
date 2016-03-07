@@ -17,6 +17,7 @@
 
 import json
 import os
+import sys
 
 from lib.common_libs import common
 
@@ -70,6 +71,15 @@ class JSON:
         if os.path.exists(preseed_cfg):
             self.log(2, "Preseed configuration file found, loading it...")
             self.__config.update(json.loads(open(preseed_cfg, "r").read()))
+
+        # Check if application added its path to sys.path. If so - also
+        # load application-specific configuration.
+        if sys.path[0] != common.TEMP_SETTINGS["SCRIPT_PATH"]:
+            app_config = os.path.join(sys.path[0], "config")
+            if os.path.exists(app_config):
+                for cfg_file in os.listdir(app_config):
+                    if cfg_file.endswith(".json"):
+                        self.__config.update(json.loads(open(cfg_file, "r").read()))
 
     def save_configuration(self):
         """
