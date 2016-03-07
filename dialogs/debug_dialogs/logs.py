@@ -53,6 +53,9 @@ class LogsDialog(Dialog):
         if self.__loading_logs:
             return
 
+        if len(dict) == 0:
+            return
+
         log_string = "[{level}][MAXMEM: {RES}][{caller}][{ts}] {data}".format(**dict["data"])
 
         orig_log_text_color = self.ui.main_log.textColor()
@@ -223,8 +226,14 @@ class LogsDialog(Dialog):
         These values might not present, so we can safely pass all
         possible errors that might appear.
         """
-        self.__log_type = int(self.config.get_value("qsettings", "logs_browser", "log_type"))
-        self.__debug_level = int(self.config.get_value("qsettings", "logs_browser", "debug_level"))
+        self.__log_type = self.config.get_value("qsettings", "logs_browser", "log_type")
+        self.__debug_level = self.config.get_value("qsettings", "logs_browser", "debug_level")
+
+        if not self.__log_type:
+            self.__log_type = 0
+        if not self.__debug_level:
+            self.__debug_level = 0
+
         try:
             self.log(2, "Setting Log type: {0}".format(self.__log_type))
             self.ui.log_type.setCurrentIndex(self.__log_type)

@@ -57,7 +57,7 @@ class Regius:
         if "logger" in preseed:
             self.__logger.initialize_preliminary_parameters(self.config, preseed["logger"])
         else:
-            self.__logger.initialize_preliminary_parameters(self.config, preseed["logger"])
+            self.__logger.initialize_preliminary_parameters(self.config)
 
         # We are still not initialized.
         self.config.set_temp_value("core/initialized", False)
