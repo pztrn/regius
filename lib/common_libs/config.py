@@ -18,11 +18,13 @@
 # Configuration library.
 
 import os
+import sys
 
 from lib.common_libs import common
 from lib.common_libs.library import Library
 
 # Configuration classes.
+from lib.common_libs.config_types.ini import INI
 from lib.common_libs.config_types.json import JSON
 
 class Config(Library):
@@ -104,12 +106,13 @@ class Config(Library):
             self.__qconfig = QConfig(self.log, self.loader)
 
         self.__json = JSON(self.log, self.loader)
+        self.__ini = INI(self.log, self.loader)
 
         # Update self.__temp_settings with values from common.TEMP_SETTINGS.
         self.__temp_settings.update(common.TEMP_SETTINGS)
 
         # Someday it will be dynamic.
-        self.__available_backends = ["JSON", "QConfig"]
+        self.__available_backends = ["INI", "JSON", "QConfig"]
 
     def load_configuration_from_files(self, preseed):
         """
@@ -122,8 +125,32 @@ class Config(Library):
             self.__qconfig.load_configuration(preseed["preseed"]["app_name"])
         else:
             self.log(0, "Skipping QConfig initialization.")
-        self.__json.load_configuration(preseed["preseed"]["app_name"])
+
+        # Set configuration path.
+        cfg_path = None
+        if "config" in preseed["paths"] and len(preseed["paths"]["config"]) != 0:
+            cfg_path = preseed["paths"]["config"]
+
+        # If configuration path doesn't start with "/" - use relative
+        # path.
+        if not cfg_path.startswith("/"):
+            cfg_path = os.path.join(sys.path[0], cfg_path)
+
+        self.log(0, "Configuration path: {cfg_path}", {"cfg_path": cfg_path})
+
+        self.__ini.load_configuration(preseed["preseed"]["app_name"], cfg_path)
+        self.__json.load_configuration(preseed["preseed"]["app_name"], cfg_path)
         self.__temp_settings.update(preseed)
+
+    def parse_env(self):
+        """
+        This method parses environment variables.
+        """
+        if not "env" in self.__temp_settings:
+            self.__temp_settings["env"] = {}
+
+        for env_key in os.environ.keys():
+            self.__temp_settings["env"][env_key] = os.environ[env_key]
 
     def save_configuration(self):
         """

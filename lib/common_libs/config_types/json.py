@@ -58,7 +58,10 @@ class JSON:
         Reads configuration from JSON file into dict.
         """
         self.__app_name = app_name
-        self.__cfg_dir = os.path.expanduser(os.path.join("~/", ".config/", "regius", self.__app_name))
+        if not config_path:
+            self.__cfg_dir = os.path.expanduser(os.path.join("~/", ".config/", "regius", self.__app_name))
+        else:
+            self.__cfg_dir = os.path.expanduser(os.path.join(config_path))
         self.__main_cfg = os.path.join(self.__cfg_dir, "config.json")
 
         self.log(0, "Reading JSON configuration...")

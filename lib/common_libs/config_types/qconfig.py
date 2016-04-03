@@ -66,7 +66,10 @@ class QConfig:
         Reads configuration from QSettings file into 2-level dict.
         """
         self.__app_name = app_name
-        self.__cfg_dir = os.path.expanduser(os.path.join("~/", ".config/", "regius", self.__app_name))
+        if not config_path:
+            self.__cfg_dir = os.path.expanduser(os.path.join("~/", ".config/", "regius", self.__app_name))
+        else:
+            self.__cfg_dir = os.path.expanduser(os.path.join(config_path))
         self.log(0, "Reading Qt configuration...")
         self.qsettings = QSettings(os.path.join("regius", self.__app_name, "qsettings"))
 

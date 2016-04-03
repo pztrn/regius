@@ -156,6 +156,11 @@ class Logger(Library):
                 self.log(0, "Setting log level to {log_level}", {"log_level": cfg_dbg_level})
                 self.__debug_level = cfg_dbg_level
 
+        # Environment variables can overwrite everything that was set
+        # previously.
+        if "DEBUG" in config.get_temp_value("env"):
+            self.__debug_level = int(config.get_temp_value("env")["DEBUG"])
+
     def log(self, level, data, replace_data = {}):
         """
         Do logprinting. By default, it will print to console. But this
@@ -377,6 +382,17 @@ class Logger(Library):
         """
         self.log(1, "Adding logging callback: {0}".format(pointer.__class__.__name__))
         self.__callbacks[callback_name] = pointer
+
+    def set_debug_level(self, level):
+        """
+        Sets debug level.
+
+        @param level Integer which represents debug level.
+        """
+        if type(level) == int:
+            self.__debug_level = level
+        else:
+            self.log(0, "{RED}ERROR:{RESET} invalid debug level: {debug_level} (type {type})!", {"debug_level": level, "type": type(level)})
 
     def unregister_callback(self, callback_name):
         """

@@ -43,6 +43,9 @@ class Regius:
         # Initialize logger.
         self.__logger = self.loader.request_library("common_libs", "logger")
         self.log = self.__logger.log
+        # Set debug level.
+        if "default_debug_level" in preseed["logger"]:
+            self.__logger.set_debug_level(preseed["logger"]["default_debug_level"])
 
         # Initialize configuration.
         self.config = self.loader.request_library("common_libs", "config")
@@ -51,6 +54,7 @@ class Regius:
         if not "app_name" in preseed["preseed"]:
             preseed["preseed"]["app_name"] = "Regius"
         self.config.load_configuration_from_files(preseed)
+        self.config.parse_env()
 
         # After configuration was properly initialized we should set
         # some logger parameters.
