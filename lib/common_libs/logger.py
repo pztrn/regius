@@ -72,11 +72,17 @@ class Logger(Library):
         # Internal variables.
         self.__vars = {
             # Was file successfully opened for writing?
-            "file_opened"       : False,
-            "OS"                : platform.system(),
+            "file_opened"           : False,
+            "OS"                    : platform.system(),
             # Skip writing logging data into dictionary?
-            "skip_complete_log" : 0
+            "skip_complete_log"     : 0,
+            # We will think that this is a time when we started application.
+            # It will be pushed to temporary vars dict.
+            # ToDo: make it be set in main module.
+            "startdate"             : datetime.datetime.now(),
         }
+
+        self.__vars["startdate_formatted"] = self.__vars["startdate"].strftime("%Y%m%d_%H%M%S")
 
         self.__callbacks = {}
         self.__complete_log = OrderedDict()
@@ -123,7 +129,7 @@ class Logger(Library):
             os.makedirs(os.path.sep.join([self._script_path, "logs"]))
 
         try:
-            log_path = os.path.sep.join([self._script_path, "logs", "main.log"])
+            log_path = os.path.sep.join([self._script_path, "logs", "{0}.log".format(self.__vars["startdate_formatted"])])
             self.log(0, "Starting writing to log file: {log_path}", {"log_path": log_path})
             self.file = open(log_path, "a")
             self.__vars["file_opened"] = 1
@@ -160,6 +166,9 @@ class Logger(Library):
         # previously.
         if "DEBUG" in config.get_temp_value("env"):
             self.__debug_level = int(config.get_temp_value("env")["DEBUG"])
+
+        # Hack: start time should be available everywhere.
+        config.set_temp_value("main/application_start_timestamp", self.__vars["startdate"])
 
     def log(self, level, data, replace_data = {}):
         """
