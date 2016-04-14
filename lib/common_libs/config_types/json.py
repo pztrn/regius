@@ -68,7 +68,11 @@ class JSON:
         # Read main config.
         if os.path.exists(self.__main_cfg):
             self.log(2, "Main configuration file found, loading it...")
-            self.__config = json.loads(open(self.__main_cfg, "r").read())
+            try:
+                self.__config = json.loads(open(self.__main_cfg, "r").read())
+            except json.decoder.JSONDecodeError:
+                self.log(0, "{YELLOW}Warning{RESET}: config.json is unusable.")
+
         # Read preseed file
         preseed_cfg = os.path.join(common.TEMP_SETTINGS["SCRIPT_PATH"], "config.json")
         if os.path.exists(preseed_cfg):
@@ -81,7 +85,7 @@ class JSON:
             app_config = os.path.join(sys.path[0], "config")
             if os.path.exists(app_config):
                 for cfg_file in os.listdir(app_config):
-                    if cfg_file.endswith(".json"):
+                    if cfg_file.endswith(".json") and cfg_file != "config.json":
                         cfg_file_path = os.path.join(app_config, cfg_file)
                         self.__config.update(json.loads(open(cfg_file_path, "r").read()))
 
@@ -112,5 +116,3 @@ class JSON:
             self.__config[group] = {}
 
         self.__config[group][key] = value
-
-

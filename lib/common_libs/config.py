@@ -73,7 +73,8 @@ class Config(Library):
         Otherwise return None.
         """
         if key in self.__temp_settings:
-            self.log(2, "Returning value for temporary variable: '{key}' = '{value}'", {"key": key, "value": self.__temp_settings[key]})
+            caller_class = sys._getframe(1).f_locals["self"].__class__.__name__
+            self.log(2, "Returning value for temporary variable to '{CYAN}{caller}{RESET}': '{key}' = '{value}'", {"caller": caller_class, "key": key, "value": self.__temp_settings[key]})
             return self.__temp_settings[key]
 
     def get_value(self, type, group, key):
@@ -82,9 +83,29 @@ class Config(Library):
         storage 'type'.
         """
         if type == "qsettings":
-            return self.__qconfig.get_value(group, key)
+            if self.__qconfig:
+                return self.__qconfig.get_value(group, key)
         elif type == "json":
             return self.__json.get_value(group, key)
+        elif type == "ini":
+            return self.__ini.get_value(group, key)
+        elif type == "all":
+            ini = self.__ini.get_value(group, key)
+            json = self.__json.get_value(group, key)
+            if self.__qconfig:
+                qsettings = self.__qconfig.get_value(group, key)
+
+            # Our preference - QConfig, then JSON, then INI. Only latter
+            # will be returned.
+            if ini:
+                return ini
+
+            if json:
+                return json
+
+            if self.__qconfig:
+                if qsettings:
+                    return qsettings
 
     def init_library(self):
         """
@@ -104,6 +125,8 @@ class Config(Library):
         if common.TEMP_SETTINGS["UI"] == "gui":
             from lib.common_libs.config_types.qconfig import QConfig
             self.__qconfig = QConfig(self.log, self.loader)
+        else:
+            self.__qconfig = None
 
         self.__json = JSON(self.log, self.loader)
         self.__ini = INI(self.log, self.loader)
@@ -112,7 +135,7 @@ class Config(Library):
         self.__temp_settings.update(common.TEMP_SETTINGS)
 
         # Someday it will be dynamic.
-        self.__available_backends = ["INI", "JSON", "QConfig"]
+        self.__available_backends = ["JSON", "INI", "QConfig"]
 
     def load_configuration_from_files(self, preseed):
         """
@@ -133,7 +156,7 @@ class Config(Library):
 
         # If configuration path doesn't start with "/" - use relative
         # path.
-        if not cfg_path.startswith("/"):
+        if cfg_path and not cfg_path.startswith("/"):
             cfg_path = os.path.join(sys.path[0], cfg_path)
 
         self.log(0, "Configuration path: {cfg_path}", {"cfg_path": cfg_path})

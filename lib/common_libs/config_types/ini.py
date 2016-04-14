@@ -42,7 +42,15 @@ class INI:
         """
         Returns a value for key in group. Easy-peasy! :)
         """
-        self.log(0, "INI.get_value() not implemented!")
+        if not group in self.__config:
+            self.log(0, "{RED}ERROR:{RESET} group '{MAGENTA}{group}{RESET}' not found in configuration! Returning None for '{BLUE}{key}{RESET}'...", {"group": group, "key": key})
+            return None
+
+        if not key in self.__config[group]:
+            self.log(0, "{RED}ERROR:{RESET} key '{BLUE}{key}{RESET}' not found in group '{MAGENTA}{group}{RESET}'! Returning None...", {"key": key, "group": group})
+            return None
+
+        return self.__config[group][key]
 
     def load_configuration(self, app_name, config_path = None):
         """

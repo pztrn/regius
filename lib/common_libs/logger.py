@@ -153,8 +153,8 @@ class Logger(Library):
         for backend in config.get_available_backends():
             cfg_dbg_level = config.get_value(backend.lower(), "logger", "debug_level")
             if cfg_dbg_level and cfg_dbg_level != self.__debug_level:
-                self.log(0, "Setting log level to {log_level}", {"log_level": cfg_dbg_level})
-                self.__debug_level = cfg_dbg_level
+                self.log(0, "Setting log level to {log_level} (from config)", {"log_level": cfg_dbg_level})
+                self.__debug_level = int(cfg_dbg_level)
 
         # Environment variables can overwrite everything that was set
         # previously.
