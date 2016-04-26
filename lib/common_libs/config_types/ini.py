@@ -50,7 +50,10 @@ class INI:
             self.log(0, "{RED}ERROR:{RESET} key '{BLUE}{key}{RESET}' not found in group '{MAGENTA}{group}{RESET}'! Returning None...", {"key": key, "group": group})
             return None
 
-        return self.__config[group][key]
+        try:
+            return int(self.__config[group][key])
+        except:
+            return self.__config[group][key]
 
     def load_configuration(self, app_name, config_path = None):
         """
@@ -97,21 +100,22 @@ class INI:
     def __load_from_directory(self, directory):
         """
         """
-        cfglist = os.listdir(directory)
-        cfglist = sorted(cfglist)
-        for config in cfglist:
-            cfgpath = os.path.join(directory, config)
-            if config.endswith("ini"):
-                config = configparser.ConfigParser()
-                cfg = config.read(cfgpath)
+        if os.path.exists(directory):
+            cfglist = os.listdir(directory)
+            cfglist = sorted(cfglist)
+            for config in cfglist:
+                cfgpath = os.path.join(directory, config)
+                if config.endswith("ini"):
+                    config = configparser.ConfigParser()
+                    cfg = config.read(cfgpath)
 
-                for section in config.keys():
-                    if not section in self.__config:
-                        self.__config[section] = {
-                            "__file_path": cfgpath
-                        }
-                    else:
-                        self.__config[section]["__file_path"] = cfgpath
+                    for section in config.keys():
+                        if not section in self.__config:
+                            self.__config[section] = {
+                                "__file_path": cfgpath
+                            }
+                        else:
+                            self.__config[section]["__file_path"] = cfgpath
 
-                    for item in config[section]:
-                        self.__config[section][item] = config[section][item]
+                        for item in config[section]:
+                            self.__config[section][item] = config[section][item]

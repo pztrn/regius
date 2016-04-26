@@ -75,15 +75,18 @@ class QConfig:
 
         self.log(1, "Reading main window configuration...")
         for item in self.qsettings.allKeys():
-            group, item = item.split("/")
-            if not group in self.__config:
-                self.__config[group] = {}
+            # We should only parse items which have "/" in it, and not
+            # starts with "com/". Related to OS X behaviour.
+            if "/" in item and not item.startswith("com/"):
+                group, item = item.split("/")
+                if not group in self.__config:
+                    self.__config[group] = {}
 
-            self.qsettings.beginGroup(group)
+                self.qsettings.beginGroup(group)
 
-            self.__config[group][item] = self.qsettings.value(item)
+                self.__config[group][item] = self.qsettings.value(item)
 
-            self.qsettings.endGroup()
+                self.qsettings.endGroup()
 
     def save_configuration(self):
         """
