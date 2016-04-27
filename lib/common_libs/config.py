@@ -175,7 +175,7 @@ class Config(Library):
         # If configuration path doesn't start with "/" - use relative
         # path.
         if cfg_path and not cfg_path.startswith("/"):
-            cfg_path = os.path.join(sys.path[0], cfg_path)
+            cfg_path = os.path.join(common.TEMP_SETTINGS["SCRIPT_PATH"], cfg_path)
 
         self.log(0, "Configuration path: {cfg_path}", {"cfg_path": cfg_path})
 
