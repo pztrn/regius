@@ -24,7 +24,7 @@ from sqlalchemy.orm import sessionmaker
 import sys
 
 from lib.common_libs import common
-from lib.common_libs.exception import TovarouchetException
+from lib.common_libs.exception import RegiusException
 from lib.common_libs.library import Library
 
 from lib.database_tools.migrator import Migrator
@@ -81,13 +81,18 @@ class Database(Library):
         self.log(2, "Composing engine string...")
 
         __db_type = "sqlite"
-        __cfg_db_type = int(self.config.get_value("qsettings", "database", "{0}_type".format(connection_name)))
+        __cfg_db_type = self.config.get_value("all", "database", "{0}_type".format(connection_name))
 
         # Checking for connection type.
-        if __cfg_db_type == 1:
-            __db_type = "postgresql+psycopg2"
-        elif __cfg_db_type == 2:
-            __db_type = "mysql+pymysql"
+        # If we have integer here - we should map to proper string
+        # representation.
+        if type(__cfg_db_type) == int:
+            if __cfg_db_type == 1:
+                __db_type = "postgresql+psycopg2"
+            elif __cfg_db_type == 2:
+                __db_type = "mysql+pymysql"
+        else:
+            __db_type = __cfg_db_type
 
         self.log(2, "Connection type: {__db_type}", {"__db_type": __db_type})
 
@@ -102,8 +107,8 @@ class Database(Library):
         elif "mysql" in __db_type:
             __port = 3306
 
-        if self.config.get_value("qsettings", "database", "{0}_port".format(connection_name)):
-            __port = self.config.get_value("qsettings", "database", "{0}_port".format(connection_name))
+        if self.config.get_value("all", "database", "{0}_port".format(connection_name)):
+            __port = self.config.get_value("all", "database", "{0}_port".format(connection_name))
 
         if __port:
             __port = ":{0}".format(__port)
@@ -115,18 +120,27 @@ class Database(Library):
         # use default port.
         self.__db_engine = "{0}://{1}:{2}@{3}{4}/{5}".format(
             __db_type,
-            self.config.get_value("qsettings", "database", "{0}_user".format(connection_name)),
-            self.config.get_value("qsettings", "database", "{0}_pass".format(connection_name)),
-            self.config.get_value("qsettings", "database", "{0}_host".format(connection_name)),
+            self.config.get_value("all", "database", "{0}_user".format(connection_name)),
+            self.config.get_value("all", "database", "{0}_pass".format(connection_name)),
+            self.config.get_value("all", "database", "{0}_host".format(connection_name)),
             __port,
-            self.config.get_value("qsettings", "database", "{0}_dbname".format(connection_name))
+            self.config.get_value("all", "database", "{0}_dbname".format(connection_name))
             )
+
+        # If we are on MySQL: add charset definition in the end of engine
+        # string.
+        if "mysql" in __db_type:
+            self.__db_engine += "?charset=utf8mb4"
 
         self.log(1, "Engine string created: '{engine_string}'", {"engine_string": self.__db_engine})
         self.config.set_temp_value("database/db_string", self.__db_engine)
 
         try:
-            self.__db_engine = create_engine(self.__db_engine, client_encoding='utf8', isolation_level="READ UNCOMMITTED")
+            # We should not pass client_encoding for MySQL connections.
+            if "mysql" in __db_type:
+                self.__db_engine = create_engine(self.__db_engine, isolation_level="READ UNCOMMITTED")
+            else:
+                self.__db_engine = create_engine(self.__db_engine, client_encoding='utf8', isolation_level="READ UNCOMMITTED")
             try:
                 self.__db_engine.connect()
             except exc.OperationalError as e:
@@ -177,7 +191,7 @@ class Database(Library):
         """
         self.log(0, "Initializing database connection...")
 
-        self.__database_data = self.config.get_keys_for_group("qsettings", "database")
+        self.__database_data = self.config.get_keys_for_group("all", "database")
 
         common.TEMP_SETTINGS["DBMap"] = declarative_base()
 
@@ -187,7 +201,12 @@ class Database(Library):
         """
         self.log(0, "Loading database mappings...")
 
-        files = os.listdir(os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "lib", "database_mappings"))
+        mappings_path = os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "lib", "database_mappings")
+        if not os.path.exists(mappings_path):
+            self.log(0, "{RED}ERROR{RESET}: database mappings loading requested, but no database mappings are found in '{mappings_path}'", {"mappings_path": mappings_path})
+            return 1
+
+        files = os.listdir(mappings_path)
 
         for item in files:
             if item.startswith("__"):
@@ -198,7 +217,7 @@ class Database(Library):
 
             self.loader.request_db_mapping(mapping_module_name)
 
-class DatabaseConnectionException(TovarouchetException):
+class DatabaseConnectionException(RegiusException):
     """
     This exception appears on connection error.
     """
@@ -206,7 +225,7 @@ class DatabaseConnectionException(TovarouchetException):
         """
         @param error String that represents error message.
         """
-        TovarouchetException.__init__(self)
+        RegiusException.__init__(self)
 
         self.start_exception()
         self.log(0, "Exception occured while connecting to database:")

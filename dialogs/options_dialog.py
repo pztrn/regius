@@ -240,8 +240,8 @@ class OptionsDialog(Dialog):
         contains common initialization tasks.
         """
         # Obtain list of code and UI files.
-        option_panes_code_path = os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "dialogs", "option_panes")
-        option_panes_uis_path = os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "ui", "option_panes")
+        option_panes_code_path = os.path.join(self.config.get_temp_value("REGIUS_PATH"), "dialogs", "option_panes")
+        option_panes_uis_path = os.path.join(self.config.get_temp_value("REGIUS_PATH"), "ui", "option_panes")
         code_files = os.listdir(option_panes_code_path)
         ui_files = os.listdir(option_panes_uis_path)
         to_load = []

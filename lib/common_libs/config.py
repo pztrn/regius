@@ -66,6 +66,24 @@ class Config(Library):
             return self.__qconfig.get_keys_for_group(group)
         elif type == "json":
             return self.__json.get_keys_for_group(group)
+        elif type == "ini":
+            return self.__ini.get_keys_for_group(group)
+        elif type == "all":
+            keys = []
+            if self.__json:
+                keys_json = self.__json.get_keys_for_group(group)
+                if keys_json:
+                    keys += keys_json
+            if self.__ini:
+                keys_ini = self.__ini.get_keys_for_group(group)
+                if keys_ini:
+                    keys += keys_ini
+            if self.get_temp_value("UI") == "gui" and self.__qconfig:
+                keys_qconfig = self.__qconfig.get_keys_for_group(group)
+                if keys_qconfig:
+                    keys += keys_qconfig
+
+            return keys
 
     def get_temp_value(self, key):
         """

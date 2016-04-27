@@ -18,7 +18,7 @@
 # Base exception class.
 
 """@package exception
-This module contains TovarouchetException class which is a base for
+This module contains RegiusException class which is a base for
 all MUI's exceptions. All exceptions should be subclassed from this
 one.
 """
@@ -26,7 +26,7 @@ one.
 from lib.common_libs import common
 from lib.common_libs.library import Library
 
-class TovarouchetException(BaseException, Library):
+class RegiusException(BaseException, Library):
     """
     Base exception. All other exceptions should be subclassed
     from this.
@@ -69,5 +69,5 @@ class TovarouchetException(BaseException, Library):
         exception in log from other text.
         """
         self.log(0, "{RED}" + ("=" * 70))
-        self.log(0, "Tovarouchet experiencing a problem:")
+        self.log(0, "{app_name} experiencing a problem:", {"app_name": self.config.get_temp_value("main/application_name")})
 

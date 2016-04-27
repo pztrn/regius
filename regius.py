@@ -109,8 +109,9 @@ class Regius:
         else:
             print("Normal shutdown completed")
 
-def init(preseed, app = None):
-    common.TEMP_SETTINGS["SCRIPT_PATH"] = "/".join(sys.modules["lib.common_libs.common"].__file__.split("/")[:-3])
+def init(preseed, app_path, app = None):
+    common.TEMP_SETTINGS["REGIUS_PATH"] = "/".join(sys.modules["lib.common_libs.loader"].__file__.split("/")[:-3])
+    common.TEMP_SETTINGS["SCRIPT_PATH"] = app_path
     #sys.path.insert(0, common.TEMP_SETTINGS["SCRIPT_PATH"])
     signal.signal(signal.SIGINT, shutdown)
     if preseed["preseed"]["ui"] == "gui":

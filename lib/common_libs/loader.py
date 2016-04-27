@@ -50,7 +50,8 @@ class Loader:
         # Database mappings.
         self.__db_mappings = {}
 
-        self._script_path = common.TEMP_SETTINGS["SCRIPT_PATH"]
+        self.__script_path = common.TEMP_SETTINGS["SCRIPT_PATH"]
+        self.__regius_path = common.TEMP_SETTINGS["REGIUS_PATH"]
 
         if not "LOGGER" in common.TEMP_SETTINGS:
             common.TEMP_SETTINGS["LOGGER"] = Logger()
@@ -185,9 +186,9 @@ class Loader:
         ui_filepath += ".ui"
 
         # Generate path to UI.
-        ui_path = os.path.join(self._script_path, ui_filepath)
+        ui_path = os.path.join(self.__regius_path, ui_filepath)
         if not os.path.exists(ui_path):
-            ui_path = os.path.join(sys.path[0], ui_filepath)
+            ui_path = os.path.join(self.__script_path, ui_filepath)
 
         self.log(2, "Regenerated file path for current OS: {filepath}", {"filepath": ui_filepath})
 

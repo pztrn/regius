@@ -188,13 +188,14 @@ class Gui(QMainWindow):
         This is used for loading widget progress bar maximum value
         calculation.
         """
+        # First - check Regius plugins.
         plugins_to_load = 0
-        for item in os.listdir(os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "plugins")):
+        for item in os.listdir(os.path.join(self.config.get_temp_value("REGIUS_PATH"), "plugins")):
             plugins_to_load += 1
 
-        if sys.path[0] != self.config.get_temp_value("SCRIPT_PATH"):
-            for item in os.listdir(os.path.join(sys.path[0], "plugins")):
-                plugins_to_load += 1
+        # Second: check application-related plugins.
+        for item in os.listdir(os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "plugins")):
+            plugins_to_load += 1
 
         return plugins_to_load
 
@@ -208,23 +209,22 @@ class Gui(QMainWindow):
         self.log(0, "Loading plugins...")
 
         # Obtain plugins list.
+        # First - get regius plugins.
+        regius_plugins = os.listdir(os.path.join(self.config.get_temp_value("REGIUS_PATH"), "plugins"))
         plugins = os.listdir(os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "plugins"))
         self.log(2, "Found plugins:")
-        self.log(2, plugins)
+        self.log(2, "From regius: {regius_plugins}", {"regius_plugins": regius_plugins})
+        self.log(2, "From {application_name}: {app_plugins}", {"app_plugins": plugins, "application_name": self.config.get_temp_value("main/application_name")})
 
         self.log(1, "Plugins list to load obtained, starting loading procedure...")
+
+        for plugin in regius_plugins:
+            self.loader.request_plugin(plugin)
+            self.loading_widget.increment_progress()
+            self.loading_widget.set_action("Plugin '{0}' loaded.".format(plugin))
 
         for plugin in plugins:
             self.loader.request_plugin(plugin)
             self.loading_widget.increment_progress()
             self.loading_widget.set_action("Plugin '{0}' loaded.".format(plugin))
 
-        if sys.path[0] != self.config.get_temp_value("SCRIPT_PATH"):
-            self.log(0, "Loading application-related plugins...")
-            plugins = os.listdir(os.path.join(sys.path[0], "plugins"))
-            self.log(2, "Found plugins:")
-            self.log(2, plugins)
-            for plugin in plugins:
-                self.loader.request_plugin(plugin)
-                self.loading_widget.increment_progress()
-                self.loading_widget.set_action("Plugin '{0}' loaded.".format(plugin))
