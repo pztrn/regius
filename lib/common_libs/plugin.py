@@ -65,3 +65,10 @@ class Plugin(Library):
         """
         ui = self.loader.request_ui(ui_filepath, None)
         return ui
+
+    def on_shutdown(self):
+        """
+        Executes on application shutdown. Should be overrided by plugin
+        if shutdown actions are required.
+        """
+        self.log(1, "Item '{CYAN}{plugin}{RESET}' have nothing to perform for shutdown", {"plugin": self._info["shortname"]})

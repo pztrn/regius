@@ -216,6 +216,11 @@ class Loader:
         """
         Executes shutdown actions on every library and plugin.
         """
+        self.log(0, "Executing shutdown sequence for plugins...")
+        for item in self.__plugins:
+            self.log(1, "Executing shutdown actions for plugin '{CYAN}{plugin}{RESET}'...", {"plugin": item})
+            self.__plugins[item].on_shutdown()
+
         self.log(0, "Shutting down libraries...")
         for item in self.__libraries:
             # Completely pass main form :)

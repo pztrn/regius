@@ -67,7 +67,7 @@ class Library:
     def on_shutdown(self):
         """
         A placeholder for shutdown method. Every library MUST have own
-        on_shutdown() implementation.
+        on_shutdown() implementation if want to execute some actions.
         """
         self.log(1, "Item '{CYAN}{library}{RESET}' have nothing to perform for shutdown", {"library": self._info["shortname"]})
 
