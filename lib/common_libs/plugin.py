@@ -71,4 +71,4 @@ class Plugin(Library):
         Executes on application shutdown. Should be overrided by plugin
         if shutdown actions are required.
         """
-        self.log(1, "Item '{CYAN}{plugin}{RESET}' have nothing to perform for shutdown", {"plugin": self._info["shortname"]})
+        self.log(1, "Plugin '{CYAN}{plugin}{RESET}' have nothing to perform for shutdown", {"plugin": self._info["shortname"]})

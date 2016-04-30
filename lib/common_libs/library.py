@@ -69,7 +69,7 @@ class Library:
         A placeholder for shutdown method. Every library MUST have own
         on_shutdown() implementation if want to execute some actions.
         """
-        self.log(1, "Item '{CYAN}{library}{RESET}' have nothing to perform for shutdown", {"library": self._info["shortname"]})
+        self.log(1, "Library '{CYAN}{library}{RESET}' have nothing to perform for shutdown", {"library": self._info["shortname"]})
 
         if "dialog" in self._info["shortname"]:
             if self.isVisible():
