@@ -6,7 +6,8 @@
         "auth": 0
     },
     "paths": {
-        "regius": "/path/to/regius/"
+        "regius": "/path/to/regius/",
+        "config": "config"
     },
     "logger": {
         "runtime_logs_access": 0,

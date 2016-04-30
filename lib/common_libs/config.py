@@ -100,13 +100,14 @@ class Config(Library):
         Returns a value for 'key' in 'group' from configuration
         storage 'type'.
         """
+        return_data = None
         if type == "qsettings":
             if self.__qconfig:
-                return self.__qconfig.get_value(group, key)
+                return_data = self.__qconfig.get_value(group, key)
         elif type == "json":
-            return self.__json.get_value(group, key)
+            return_data = self.__json.get_value(group, key)
         elif type == "ini":
-            return self.__ini.get_value(group, key)
+            return_data = self.__ini.get_value(group, key)
         elif type == "all":
             ini = self.__ini.get_value(group, key)
             json = self.__json.get_value(group, key)
@@ -116,14 +117,22 @@ class Config(Library):
             # Our preference - QConfig, then JSON, then INI. Only latter
             # will be returned.
             if ini:
-                return ini
+                return_data = ini
 
             if json:
-                return json
+                return_data = json
 
             if self.__qconfig:
                 if qsettings:
-                    return qsettings
+                    return_data = qsettings
+
+        # We do not want passwords to appear in logs, aren't we?
+        value_for_log = return_data
+        if "pass" in key:
+            value_for_log = "**EDITED**"
+
+        self.log(2, "Returning configuration data: {CYAN}{key}{RESET} => {YELLOW}{value}{RESET}", {"key": "{0}/{1}".format(group, key), "value": value_for_log})
+        return return_data
 
     def init_library(self):
         """
