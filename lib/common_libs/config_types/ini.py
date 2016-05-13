@@ -36,7 +36,19 @@ class INI:
         """
         Returns all keys for specified group.
         """
-        self.log(0, "INI.get_keys_for_group() not implemented!")
+        if not group in self.__config:
+            self.log(0, "{RED}ERROR:{RESET} group '{MAGENTA}{group}{RESET}' not found in configuration! Returning None for '{BLUE}{key}{RESET}'...", {"group": group, "key": key})
+            return None
+
+        keys = []
+        for key in self.__config[group]:
+            # We don't need keys that starts with "__" here, they are
+            # internal.
+            if key.startswith("__"):
+                continue
+            keys.append(key)
+
+        return keys
 
     def get_value(self, group, key):
         """

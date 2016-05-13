@@ -72,6 +72,12 @@ class Regius:
         else:
             self.config.set_temp_value("main/application_name", "Regius")
 
+        # Set application version from preseed config.
+        if "version" in preseed["preseed"]:
+            self.config.set_temp_value("main/application_version", preseed["preseed"]["version"])
+        else:
+            self.config.set_temp_value("main/application_version", "0.0.0-Unknown")
+
         # Next part will be executed only if GUI mode is activated.
         if preseed["preseed"]["ui"] == "gui":
             from lib.common_libs.gui import Gui
