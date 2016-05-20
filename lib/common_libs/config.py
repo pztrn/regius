@@ -207,13 +207,19 @@ class Config(Library):
         Force configuration to be saved.
         """
         self.log(0, "Saving configuration...")
-        result = self.__qconfig.save_configuration()
-        if result:
-            self.log(0, "{RED}ERROR:{RESET} failed to save Qt-related configuration!")
+        if self.__qconfig:
+            result = self.__qconfig.save_configuration()
+
+            if result:
+                self.log(0, "{RED}ERROR:{RESET} failed to save Qt-related configuration!")
 
         result = self.__json.save_configuration()
         if result:
             self.log(0, "{RED}ERROR:{RESET} failed to save JSON configuration!")
+
+        result = self.__ini.save_configuration()
+        if result:
+            self.log(0, "{RED}ERROR:{RESET} failed to save INI configuration!")
 
     def set_temp_value(self, key, value):
         """

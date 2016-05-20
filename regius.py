@@ -127,7 +127,9 @@ def init(preseed, app_path, app = None):
         return (window, app)
         #exit(app.exec_())
     elif preseed["preseed"]["ui"] == "cli":
-        return Regius(preseed)
+        global window
+        window = Regius(preseed)
+        return window
 
 def shutdown(signal, frame):
     print("Got signal: {0}".format(signal))
