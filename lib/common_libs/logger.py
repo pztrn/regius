@@ -392,6 +392,15 @@ class Logger(Library):
         self.log(1, "Adding logging callback: {0}".format(pointer.__class__.__name__))
         self.__callbacks[callback_name] = pointer
 
+    def register_commander(self, commander_handler):
+        """
+        Registers CLI commander, which will take all CLI input.
+
+        @param commander_handler Pointer to method which will take user
+        input.
+        """
+        self.__commander = commander_handler
+
     def set_debug_level(self, level):
         """
         Sets debug level.

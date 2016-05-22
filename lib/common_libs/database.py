@@ -118,14 +118,17 @@ class Database(Library):
         # If port was defined - add ":" in front, so it will be
         # counted as port. If nothing is defined, then it will
         # use default port.
-        self.__db_engine = "{0}://{1}:{2}@{3}{4}/{5}".format(
-            __db_type,
-            self.config.get_value("all", "database", "{0}_user".format(connection_name)),
-            self.config.get_value("all", "database", "{0}_pass".format(connection_name)),
-            self.config.get_value("all", "database", "{0}_host".format(connection_name)),
-            __port,
-            self.config.get_value("all", "database", "{0}_dbname".format(connection_name))
-            )
+        if __db_type != "sqlite":
+            self.__db_engine = "{0}://{1}:{2}@{3}{4}/{5}".format(
+                __db_type,
+                self.config.get_value("all", "database", "{0}_user".format(connection_name)),
+                self.config.get_value("all", "database", "{0}_pass".format(connection_name)),
+                self.config.get_value("all", "database", "{0}_host".format(connection_name)),
+                __port,
+                self.config.get_value("all", "database", "{0}_dbname".format(connection_name))
+                )
+        else:
+            self.__db_engine = "{0}:///{1}".format(__db_type, self.config.get_value("all", "database", "{0}_dbname".format(connection_name)))
 
         # If we are on MySQL: add charset definition in the end of engine
         # string.
@@ -138,6 +141,8 @@ class Database(Library):
         try:
             # We should not pass client_encoding for MySQL connections.
             if "mysql" in __db_type:
+                self.__db_engine = create_engine(self.__db_engine, isolation_level="READ UNCOMMITTED")
+            elif "sqlite" in __db_type:
                 self.__db_engine = create_engine(self.__db_engine, isolation_level="READ UNCOMMITTED")
             else:
                 self.__db_engine = create_engine(self.__db_engine, client_encoding='utf8', isolation_level="READ UNCOMMITTED")

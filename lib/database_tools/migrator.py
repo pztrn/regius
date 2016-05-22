@@ -56,12 +56,13 @@ class Migrator(Library):
         """
         Execute framework database migrations.
         """
-        if os.path.exists(os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "alembic.ini")) and os.path.exists(os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "migrations")):
+        script_path = self.config.get_temp_value("SCRIPT_PATH")
+        if os.path.exists(os.path.join(script_path, "alembic.ini")) and os.path.exists(os.path.join(script_path, "migrations")):
             self.log(0, "Executing core database migrations...")
             self.log(2, "Loading alembic configuration...")
-            core_config = Config(os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "alembic.ini"))
-            core_config.set_main_option("script_location", os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "migrations"))
-            core_config.set_main_option("version_table_name", "db_version_for_core")
+            core_config = Config(os.path.join(script_path, "alembic.ini"))
+            core_config.set_main_option("script_location", os.path.join(script_path, "migrations"))
+            core_config.set_main_option("version_table", "db_version_for_core")
             core_config.set_main_option("sqlalchemy.url", self.config.get_temp_value("database/db_string"))
 
             self.log(2, "Running migrations...")
@@ -74,25 +75,25 @@ class Migrator(Library):
         Executing plugins migrations.
         """
         conn = self.__database.get_database_connection()
+        plugins_path = os.path.join(os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "plugins"))
 
         self.log(0, "Executing migrations for plugins...")
 
         self.log(2, "Getting list of available plugins...")
-        plugins = os.listdir(os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "plugins"))
+        plugins = os.listdir(plugins_path)
 
         for plugin in plugins:
-            if plugin.endswith("__") or plugin.endswith(".py") or plugin.endswith(".pyc") or plugin.endswith(".pyo"):
-                self.log(0, "{RED}ERROR: unsupported type of plugin: {plugin_name}{RESET}", {"plugin_name": plugin})
+            if plugin.endswith("__") or plugin.endswith(".py") or plugin.endswith(".pyc") or plugin.endswith(".pyo") or plugin == ".DS_Store":
                 continue
 
             self.log(1, "Searching for migrations for plugin '{CYAN}{plugin_name}{RESET}'...", {"plugin_name": plugin})
-            plugin_path = os.path.join(self.config.get_temp_value("SCRIPT_PATH"), "plugins", plugin)
+            plugin_path = os.path.join(plugins_path, plugin)
             if "alembic.ini" in os.listdir(plugin_path):
                 self.log(1, "Alembic configuration found, executing migrations for plugin '{CYAN}{plugin_name}{RESET}'...", {"plugin_name": plugin})
 
                 alembic_config = Config(os.path.join(plugin_path, "alembic.ini"))
                 alembic_config.set_main_option("script_location", "plugins/{0}/migrations".format(plugin))
-                alembic_config.set_main_option("version_table_name", "db_version_for_plugin_{0}".format(plugin))
+                alembic_config.set_main_option("version_table", "db_version_for_plugin_{0}".format(plugin))
                 alembic_config.set_main_option("sqlalchemy.url", self.config.get_temp_value("database/db_string"))
                 # Beginning with processing migrations for plugin.
                 with conn.begin() as connection:

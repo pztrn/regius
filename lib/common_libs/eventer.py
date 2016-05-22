@@ -40,6 +40,8 @@ class Eventer(Library):
         """
         self.log(0, "Initializing Event Handler...")
 
+        self.__suppress_fire_messages = self.config.get_temp_value("eventer")["suppress_fire_messages"]
+
     def add_event(self, event_name, description = None):
         """
         Adds event to events list. After adding event handlers can be added
@@ -85,9 +87,12 @@ class Eventer(Library):
             self.log(0, "{RED}ERROR{RESET}: failed to fire event '{CYAN}{event_name}{RESET}': event does not exist", {"event_name": event_name})
             return
 
-        self.log(0, "Firing event '{CYAN}{event_name}{RESET}'...", {"event_name": event_name})
+        if not self.__suppress_fire_messages:
+            self.log(0, "Firing event '{CYAN}{event_name}{RESET}'...", {"event_name": event_name})
+
         for weight in self.__events[event_name]["handlers"]:
-            self.log(2, "Firing handler '{MAGENTA}{handler}{RESET}' for '{CYAN}{event_name}{RESET}'...", {"event_name": event_name, "handler": self.__events[event_name]["handlers"][weight]["name"]})
+            if not self.__suppress_fire_messages:
+                self.log(2, "Firing handler '{MAGENTA}{handler}{RESET}' for '{CYAN}{event_name}{RESET}'...", {"event_name": event_name, "handler": self.__events[event_name]["handlers"][weight]["name"]})
             self.__events[event_name]["handlers"][weight]["handler"](data)
 
     def get_events(self):

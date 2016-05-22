@@ -12,5 +12,8 @@
     "logger": {
         "runtime_logs_access": 0,
         "default_debug_level": 0
+    },
+    "eventer": {
+        "suppress_fire_messages": 1
     }
 }

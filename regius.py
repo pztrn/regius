@@ -114,6 +114,7 @@ class Regius:
             exit(1)
         else:
             print("Normal shutdown completed")
+            exit()
 
 def init(preseed, app_path, app = None):
     common.TEMP_SETTINGS["REGIUS_PATH"] = "/".join(sys.modules["lib.common_libs.loader"].__file__.split("/")[:-3])
