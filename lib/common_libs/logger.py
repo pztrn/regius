@@ -29,7 +29,7 @@ from lib.common_libs.library import Library
 ############################# COLORS DEFINITION
 # Colors for terminal output.
 TERM_COLORS = {
-    "RESET"     : "\033[1;m",
+    "RESET"     : "\033[m",
     "RED"       : "\033[1;31m",
     "GREEN"     : "\033[1;32m",
     "YELLOW"    : "\033[1;33m",
@@ -391,15 +391,6 @@ class Logger(Library):
         """
         self.log(1, "Adding logging callback: {0}".format(pointer.__class__.__name__))
         self.__callbacks[callback_name] = pointer
-
-    def register_commander(self, commander_handler):
-        """
-        Registers CLI commander, which will take all CLI input.
-
-        @param commander_handler Pointer to method which will take user
-        input.
-        """
-        self.__commander = commander_handler
 
     def set_debug_level(self, level):
         """
