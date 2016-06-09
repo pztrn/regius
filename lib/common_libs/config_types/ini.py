@@ -37,7 +37,7 @@ class INI:
         Returns all keys for specified group.
         """
         if not group in self.__config:
-            self.log(0, "{RED}ERROR:{RESET} group '{MAGENTA}{group}{RESET}' not found in configuration! Returning None for '{BLUE}{key}{RESET}'...", {"group": group, "key": key})
+            self.log(0, "{RED}ERROR:{RESET} group '{MAGENTA}{group}{RESET}' not found in configuration! Returning None for '{BLUE}{group}{RESET}'...", {"group": group})
             return None
 
         keys = []
