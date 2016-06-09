@@ -37,11 +37,15 @@ class Plugin(Library):
         """
         Returns a dictionary with option pane name and instance.
         """
-        ui = {
-            "name"      : self._info["shortname"],
-            "widget"    : self.loader.request_ui("plugins/{0}/ui/options".format(self._info["shortname"]), None)
-        }
-        return ui
+        widget = self.loader.request_ui("plugins/{0}/ui/options".format(self._info["shortname"]), None)
+        if not widget:
+            self.log(0, "{YELLOW}WARN{RESET}: no options interface for plugin '{CYAN}{plugin_name}{RESET}'!", {"plugin_name": self._info["name"]})
+        else:
+            ui = {
+                "name"      : self._info["shortname"],
+                "widget"    : widget
+            }
+            return ui
 
     def init_plugin(self):
         """

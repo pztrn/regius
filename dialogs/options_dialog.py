@@ -298,6 +298,11 @@ class OptionsDialog(Dialog):
             plugin_name = plugin.__class__.__name__
             self.log(2, "Obtaining UI for plugin {plugin}...", {"plugin": plugin_name})
             ui = plugin.get_option_pane()
+            if not ui:
+                self.log(1, "{RED}Failed to load option pane for plugin '{CYAN}{plugin_name}{RESET}'", {"plugin_name": plugin_name})
+                if not plugin.__class__._info["shortname"] in self.__failed_to_load:
+                    self.__failed_to_load.append(plugin.__class__._info["shortname"])
+                continue
             self.__option_panes_uis[ui["name"]] = ui
             self.__option_panes_uis[ui["name"]]["index"] = self.ui.widget.count()
             tree_item = QTreeWidgetItem(self.plugins_root_item)

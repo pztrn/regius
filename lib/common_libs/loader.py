@@ -200,7 +200,11 @@ class Loader:
             # And no, I saw no memory footprint increasing while doing
             # this. And yes, this is not PEP8.
             from PyQt5 import uic
-            ui = uic.loadUi(ui_path, instance)
+            try:
+                ui = uic.loadUi(ui_path, instance)
+            except FileNotFoundError:
+                self.log(2, "{RED}FileNotFoundError{RESET}")
+                return None
 
             # Assing UI instance to self.__uis element, so we could request
             # a pointer to it later in other parts of program.
