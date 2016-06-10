@@ -94,12 +94,12 @@ class INI:
                 self.__config[section][item] = config[section][item]
 
         self.log(2, "Loading configuration from sorted list of files...")
-        self.log(2, "Loading configuration from user's home directory...")
+        self.log(1, "Loading configuration from '{MAGENTA}{cfg_dir}{RESET}'...", {"cfg_dir": self.__cfg_dir})
         self.__load_from_directory(self.__cfg_dir)
 
     def save_configuration(self):
         """
-        Saves configuration to QSettings instance.
+        Saves configuration to disk.
         """
         self.log(0, "INI.save_configuration() not implemented!")
 
@@ -111,6 +111,7 @@ class INI:
 
     def __load_from_directory(self, directory):
         """
+        Loads files from passed directory.
         """
         if os.path.exists(directory):
             cfglist = os.listdir(directory)
@@ -118,6 +119,7 @@ class INI:
             for config in cfglist:
                 cfgpath = os.path.join(directory, config)
                 if config.endswith("ini"):
+                    self.log(2, "Loading configuration file '{CYAN}{cfg_file}{RESET}'", {"cfg_file": cfgpath})
                     config = configparser.ConfigParser()
                     cfg = config.read(cfgpath)
 
