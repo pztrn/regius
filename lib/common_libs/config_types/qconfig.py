@@ -66,12 +66,8 @@ class QConfig:
         Reads configuration from QSettings file into 2-level dict.
         """
         self.__app_name = app_name
-        if not config_path:
-            self.__cfg_dir = os.path.expanduser(os.path.join("~/", ".config/", "regius", self.__app_name))
-        else:
-            self.__cfg_dir = os.path.expanduser(os.path.join(config_path))
         self.log(0, "Reading Qt configuration...")
-        self.qsettings = QSettings(os.path.join("regius", self.__app_name, "qsettings"))
+        self.qsettings = QSettings("regius", self.__app_name)
 
         self.log(1, "Reading main window configuration...")
         for item in self.qsettings.allKeys():
@@ -88,15 +84,13 @@ class QConfig:
 
                 self.qsettings.endGroup()
 
+        print(self.__config)
+
     def save_configuration(self):
         """
         Saves configuration to QSettings instance.
         """
         self.log(0, "Saving Qt configuration...")
-
-        # Create configuration directory, if it not exist.
-        if not os.path.exists(self.__cfg_dir):
-            os.makedirs(self.__cfg_dir)
 
         for section in self.__config:
             if len(self.__config[section]) > 0:

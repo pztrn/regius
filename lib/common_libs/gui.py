@@ -28,6 +28,18 @@ class Gui(QMainWindow):
 
         # Set application name.
         self.ui.setWindowTitle(self.config.get_temp_value("main/application_name"))
+        # OS X "hack" - set application title into Finder's top bar.
+        # This requires pyobjc installed. So check for it first?
+        if sys.platform == 'darwin':
+            try:
+                from Foundation import NSBundle
+                bundle = NSBundle.mainBundle()
+                if bundle:
+                    info = bundle.localizedInfoDictionary() or bundle.infoDictionary()
+                    if info and info['CFBundleName'] == 'Python':
+                        info['CFBundleName'] = self.config.get_temp_value("main/application_name")
+            except:
+                self.log(0, "{RED}ERROR{RESET}: cannot import PyObjC module Foundation. Can't change application title.")
 
         # Restore window sizes and position.
         sizes = self.config.get_value("qsettings", "mainwindow", "size")

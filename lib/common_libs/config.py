@@ -237,3 +237,5 @@ class Config(Library):
             self.__qconfig.set_value(group, key, value)
         elif type == "json":
             self.__json.set_value(group, key, value)
+        else:
+            self.log(0, "{RED}ERROR{RESET}: unsupported configuration storage: '{CYAN}{type}{RESET}'", {"type": type})
